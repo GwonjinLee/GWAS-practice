@@ -1,0 +1,70 @@
+# clear working environment
+rm(list=ls()) 
+
+# set your working directory
+## First prepare a folder for your practice and copy/paste your folder in Rstudio
+setwd("YOUR WORKING FOLDER")
+
+getwd()
+
+source("http://zzlab.net/GAPIT/GAPIT.library.R")
+source("http://zzlab.net/GAPIT/gapit_functions.txt")
+
+# Import data from Zhiwu Zhang Lab
+myY <- read.table("http://zzlab.net/GAPIT/data/mdp_traits.txt", head = TRUE)
+View(myY)
+
+myGD=read.table(file="http://zzlab.net/GAPIT/data/mdp_numeric.txt",head=T)
+
+head(myGD)[ ,c(1:10)] # just check the top 10 columns 
+
+myGM=read.table(file="http://zzlab.net/GAPIT/data/mdp_SNP_information.txt",head=T)
+head(myGM)
+
+# GWAS using MLM
+myGAPIT=GAPIT(
+  Y=myY[,c(1,2)], #fist column is ID and second is a phenotype (EarHT)
+  GD=myGD,
+  GM=myGM,
+  PCA.total=3,
+  model=c("MLM")
+  )
+
+
+
+# Check the result table
+View(myGAPIT$GWAS)
+
+
+#######################################################################################################################################################
+
+#  plotting
+
+## Load library (install if necessary)
+library(qqman)
+library(ggplot2)
+
+## Load result
+result <- read.csv("GAPIT.Association.GWAS_Results.MLM.EarHT.csv",  header = TRUE)
+
+head(result)
+
+
+## Manhattan plot
+manhattan(result, main="Ear height", chr = "Chr", bp = "Pos", p = "P.value", snp = "SNP", 
+          col = c("blue", "orange"), 
+          genomewideline = 3.5,  highlight = "PZA03188.4"  )
+
+
+
+## Save the plot
+png("manhattan_plot.png", width = 8, height = 4, units = "in", res = 300 )
+
+manhattan(result, main="Ear height", chr = "Chr", bp = "Pos", p = "P.value", snp = "SNP", 
+          col = c("blue", "orange"), 
+          genomewideline = 3.5,  highlight = "PZA03188.4"  )
+
+dev.off()
+
+
+
